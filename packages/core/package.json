@@ -1,0 +1,19 @@
+{
+  "name": "stream-mixer-core",
+  "version": "0.0.1",
+  "description": "A video stream mixing library",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EcmaserveGames/stream-mixer.git"
+  },
+  "author": "Ryan Hafer <hafer.ryan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EcmaserveGames/stream-mixer/issues"
+  },
+  "homepage": "https://github.com/EcmaserveGames/stream-mixer#readme"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "stream-mixer-preact",
+  "version": "0.0.1",
+  "description": "A preact implementation for stream mixer",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Ryan Hafer <hafer.ryan@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "preact": "^10.5.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EcmaserveGames/stream-mixer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EcmaserveGames/stream-mixer/issues"
+  },
+  "homepage": "https://github.com/EcmaserveGames/stream-mixer#readme"
+}
