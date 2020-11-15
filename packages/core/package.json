@@ -2,9 +2,9 @@
   "name": "stream-mixer-core",
   "version": "0.0.1",
   "description": "A video stream mixing library",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc -d"
   },
   "repository": {
     "type": "git",

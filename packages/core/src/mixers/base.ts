@@ -8,11 +8,13 @@ export class BaseMixer implements Mixer {
   public height: number = 0
   public bucketId?: string
 
-  public events = new EventHub('resize', 'frame')
+  public events = new EventHub('resize', 'frame', 'stat')
   public input?: IInput
   public output?: IOutput
   public onInputFrame: EventCallback<'frame'>
   public onOutputResize: EventCallback<'resize'>
+  public onInputAttached: (input: IInput) => void
+  public onOutputAttached: (output: IOutput) => void
 
   private revokables: RevokeListener[] = []
 
@@ -27,6 +29,8 @@ export class BaseMixer implements Mixer {
       if (evt.source === this) return
       this.events.dispatchEvent('resize', this, evt.data)
     }
+    this.onInputAttached = () => {}
+    this.onOutputAttached = () => {}
   }
 
   public pull() {
@@ -34,8 +38,8 @@ export class BaseMixer implements Mixer {
   }
 
   public on(
-    type: 'frame' | 'resize',
-    callback: EventCallback<'frame' | 'resize'>
+    type: 'frame' | 'resize' | 'stat',
+    callback: EventCallback<'frame' | 'resize' | 'stat'>
   ) {
     this.events.addEventListener(type, callback)
     return () => this.events.removeEventListener(type, callback)
@@ -53,6 +57,7 @@ export class BaseMixer implements Mixer {
     this.input = input
     const revoke = input.on('frame', this.onInputFrame)
     this.revokables.push(revoke)
+    this.onInputAttached(input)
     return this
   }
 
@@ -60,6 +65,7 @@ export class BaseMixer implements Mixer {
     this.output = output
     const revoke = output.on('resize', this.onOutputResize)
     this.revokables.push(revoke)
+    this.onOutputAttached(output)
     return this
   }
 }

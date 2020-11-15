@@ -1,7 +1,7 @@
-export interface StreamEvent<T extends string> {
+export interface StreamEvent<T extends string, TData = Record<string, any>> {
   type: T
   source?: any
-  data?: Record<string, any>
+  data?: TData
 }
 
 export type EventCallback<T extends string> = (event: StreamEvent<T>) => void

@@ -1,22 +1,19 @@
-import { CameraAsset } from 'core/src/assets/camera'
+import { CameraAsset } from '../assets/camera'
 import { EventCallback, EventHub } from '../events'
 import { getId } from '../ids'
 import { IInput } from '../types'
 
 export class CameraInput implements IInput {
   public id: string
-  private frameRate: number = 0
+  private fps: number = 0
   private asset: CameraAsset
   private events = new EventHub('frame')
 
-  public constructor(
-    id: string,
-    cameraAsset: CameraAsset,
-    frameRate: number = 0
-  ) {
+  public constructor(id: string, cameraAsset: CameraAsset, fps: number = 30) {
     this.id = id || getId()
     this.asset = cameraAsset
-    this.frameRate = frameRate
+    this.fps = fps
+    this.run()
   }
 
   get width() {
@@ -24,14 +21,14 @@ export class CameraInput implements IInput {
   }
 
   get height() {
-    return this.asset.width
+    return this.asset.height
   }
 
   private run = () => {
     if (!this.asset.node.paused) {
       this.events.dispatchEvent('frame', this)
     }
-    setTimeout(this.run, this.frameRate)
+    setTimeout(this.run, 1000 / this.fps)
   }
 
   public on(type: 'frame', callback: EventCallback<'frame'>) {

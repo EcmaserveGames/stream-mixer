@@ -22,11 +22,11 @@ export class VideoAsset implements IAsset {
     video.addEventListener('playing', this.onPlaying)
     video.addEventListener('pause', this.onPause)
     this.node = video
-    this.load()
+    this.initialize()
   }
 
-  public async load() {
-    const bucket = AssetBucket.getBucketById(this.id)
+  private initialize() {
+    const bucket = AssetBucket.getBucketById(this.bucketId)
     bucket?.register(this)
   }
 
@@ -41,9 +41,9 @@ export class VideoAsset implements IAsset {
   }
 
   public dispose() {
-    this.node.addEventListener('playing', this.onPlaying)
-    this.node.addEventListener('pause', this.onPause)
-    const bucket = AssetBucket.getBucketById(this.id)
+    this.node.removeEventListener('playing', this.onPlaying)
+    this.node.removeEventListener('pause', this.onPause)
+    const bucket = AssetBucket.getBucketById(this.bucketId)
     bucket?.unregister(this)
   }
 }

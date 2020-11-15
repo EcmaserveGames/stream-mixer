@@ -13,9 +13,9 @@ export class Output implements IOutput {
 
   constructor(width: number, height: number, id?: string) {
     this.id = id || getId()
-    const query = document.getElementById('canvas#' + id)
-    if (isCanvasElement(query)) {
-      this.canvas = query
+    const element = document.getElementById(this.id)
+    if (isCanvasElement(element)) {
+      this.canvas = element
       this.resize(width, height)
     }
   }

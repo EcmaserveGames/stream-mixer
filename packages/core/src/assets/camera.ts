@@ -19,7 +19,7 @@ export class CameraAsset implements IAsset<HTMLVideoElement> {
     this.node = this.video.node
   }
 
-  async load(constraints: MediaTrackConstraints) {
+  public async load(constraints: MediaTrackConstraints) {
     this.mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: constraints,
@@ -28,12 +28,12 @@ export class CameraAsset implements IAsset<HTMLVideoElement> {
     this.node.srcObject = this.mediaStream
   }
 
-  onPlaying = () => {
+  private onPlaying = () => {
     this.width = this.node.videoWidth
     this.height = this.node.videoHeight
   }
 
-  dispose() {
+  public dispose() {
     this.node.removeEventListener('playing', this.onPlaying)
     this.video.dispose()
     this.mediaStream?.getTracks().forEach((t) => t.stop())

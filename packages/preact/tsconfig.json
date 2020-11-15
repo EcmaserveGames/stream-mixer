@@ -1,11 +1,15 @@
 {
     "extends": "../../tsconfig.shared.json",
     "include": [
-        "./src/**/*.ts",
-        "./src/**/*.tsx",
-        "./src/**/*.js"
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.js"
     ],
+    "paths": {},
     "compilerOptions": {
-        "outDir": "./lib"
+        "rootDir": "./src",
+        "outDir": "./lib",
+        "jsx": "react",
+        "jsxFactory": "h"
     }
 }

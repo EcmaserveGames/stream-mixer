@@ -25,8 +25,8 @@ export interface IOutput extends Renderable {
 export type Mixer = {
   bucketId?: string
   on(
-    type: 'resize' | 'frame',
-    callback: EventCallback<'resize' | 'frame'>
+    type: 'resize' | 'frame' | 'stat',
+    callback: EventCallback<'resize' | 'frame' | 'stat'>
   ): RevokeListener
   pull(): CanvasImageSource | null | undefined
   push(media: CanvasImageSource): void

@@ -1,4 +1,5 @@
-import { CanvasAsset } from 'core/src/assets/canvas'
+import { CanvasAsset } from '../assets/canvas'
+import { StreamEvent } from '../events'
 import { BaseMixer } from './base'
 
 interface Dimensions {
@@ -11,9 +12,27 @@ export enum ScaleMode {
   Fit = 'Fit',
 }
 
+export function isResizeStat(
+  evt: StreamEvent<'stat' | 'frame' | 'resize'>
+): evt is StreamEvent<'stat', ResizeStats> {
+  if (evt.source instanceof ResizeMixer && evt.type === 'stat') {
+    return true
+  }
+  return false
+}
+
+export interface ResizeStats {
+  mode: ScaleMode
+  source: Dimensions
+  destination: Dimensions
+  scaling: [number, number, number, number]
+}
+
 export class ResizeMixer extends BaseMixer {
   private scaleMode: ScaleMode
   private canvas: CanvasAsset
+  private lastStats?: ResizeStats
+
   constructor(
     bucketId: string,
     id?: string,
@@ -34,11 +53,26 @@ export class ResizeMixer extends BaseMixer {
     this.onOutputResize = (evt) => {
       const inputMedia = this.input?.pull()
       if (!inputMedia) return
-      this.draw(inputMedia)
       const result = this.draw(inputMedia)
       if (result) {
         this.output?.push(this.canvas.node)
       }
+    }
+    this.onInputAttached = this.attachment
+    this.onOutputAttached = (output) => {
+      this.width = output.width
+      this.height = output.height
+      this.attachment()
+    }
+  }
+
+  private attachment = () => {
+    if (!this.input || !this.output) return
+
+    this.canvas.load(this.output.width, this.output.height)
+    const result = this.draw(this.input.pull())
+    if (result) {
+      this.output.push(this.canvas.node)
     }
   }
 
@@ -88,6 +122,13 @@ export class ResizeMixer extends BaseMixer {
       this.input.height,
       ...scaling
     )
+    this.lastStats = {
+      mode: this.scaleMode,
+      source,
+      destination,
+      scaling,
+    }
+    this.events.dispatchEvent('stat', this, this.lastStats)
     return true
   }
 
@@ -95,79 +136,66 @@ export class ResizeMixer extends BaseMixer {
     source: Dimensions,
     destination: Dimensions
   ): [number, number, number, number] {
-    var widthGap = destination.w - source.w
-    var heightGap = destination.h - source.h
+    let delta = 1
+    let axis: 'x' | 'y' = 'x'
+    let offsetX = 0
+    let offsetY = 0
 
-    var scaledW = source.w
-    var scaledH = source.h
+    var xGapScale = (source.w - destination.w) / source.w
+    var yGapScale = (source.h - destination.h) / source.h
 
-    if (widthGap > 0 || heightGap > 0) {
-      // Scale Up;
-      if (widthGap > heightGap) {
-        scaledW = destination.w
-        scaledH = (destination.w / source.w) * source.h
-      }
-      if (widthGap < heightGap) {
-        scaledW = (destination.h / source.h) * source.w
-        scaledH = destination.h
-      }
+    if (yGapScale < xGapScale) {
+      axis = 'y'
+      delta = destination.h / source.h
+    } else {
+      axis = 'x'
+      delta = destination.w / source.w
     }
 
-    if (widthGap < 0 && heightGap < 0) {
-      // Scale Down;
-      if (widthGap < heightGap) {
-        scaledW = destination.w
-        scaledH = (destination.w / source.w) * source.h
-      }
-      if (widthGap > heightGap) {
-        scaledW = (destination.h / source.h) * source.w
-        scaledH = destination.h
-      }
+    var scaled = {
+      width: source.w * delta,
+      height: source.h * delta,
     }
 
-    var sourceX = (destination.w - scaledW) / 2
-    var sourceY = (destination.h - scaledH) / 2
+    if (axis === 'y') {
+      offsetX = (destination.w - scaled.width) / 2
+    } else {
+      offsetY = (destination.h - scaled.height) / 2
+    }
 
-    return [sourceX, sourceY, scaledW, scaledH]
+    return [offsetX, offsetY, scaled.width, scaled.height]
   }
 
   private fit(
     source: Dimensions,
     destination: Dimensions
   ): [number, number, number, number] {
-    var widthGap = destination.w - source.w
-    var heightGap = destination.h - source.h
+    const inputAspect = source.w / source.h
+    const frameAspect = destination.w / destination.h
+    let delta = 1
+    let axis: 'x' | 'y' = 'x'
+    let offsetX = 0
+    let offsetY = 0
 
-    var scaledW = source.w
-    var scaledH = source.h
-
-    if (widthGap > 0 || heightGap > 0) {
-      // Scale Up;
-      if (widthGap < heightGap) {
-        scaledW = destination.w
-        scaledH = (destination.w / source.w) * source.h
-      }
-      if (widthGap > heightGap) {
-        scaledW = (destination.h / source.h) * source.w
-        scaledH = destination.h
-      }
+    if (frameAspect > inputAspect) {
+      axis = 'y'
+      delta = destination.h / source.h
+    } else {
+      axis = 'x'
+      delta = destination.w / source.w
     }
 
-    if (widthGap < 0 && heightGap < 0) {
-      // Scale Down;
-      if (widthGap < heightGap) {
-        scaledW = destination.w
-        scaledH = (destination.w / source.w) * source.h
-      }
-      if (widthGap > heightGap) {
-        scaledW = (destination.h / source.h) * source.w
-        scaledH = destination.h
-      }
+    var scaled = {
+      width: source.w * delta,
+      height: source.h * delta,
     }
 
-    var sourceX = (destination.w - scaledW) / 2
-    var sourceY = (destination.h - scaledH) / 2
+    if (axis === 'y') {
+      offsetX = (destination.w - scaled.width) / 2
+    } else {
+      offsetY = (destination.h - scaled.height) / 2
+    }
 
-    return [sourceX, sourceY, scaledW, scaledH]
+    return [offsetX, offsetY, scaled.width, scaled.height]
   }
 }
