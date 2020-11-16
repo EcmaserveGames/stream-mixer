@@ -3,6 +3,7 @@ export { CameraAsset } from './assets/camera'
 export { CanvasAsset } from './assets/canvas'
 export { CameraInput } from './inputs/camera'
 export { CanvasInput } from './inputs/canvas'
+export { BaseMixer as Connector } from './mixers/base'
 export {
   ResizeMixer,
   ScaleMode,

@@ -21,22 +21,17 @@ export function ResizeToFit() {
         setStat(evt.data)
       }
     })
-    const inputResolver = streamMixer
-      .createCameraInput(
-        {
-          width: 640,
-          height: 480,
-        },
-        1
-      )
-      .then((input) => {
-        resizer.setInput(input)
-        resizer.setOuput(output)
-        return input
-      })
+    const input = streamMixer.createCameraInput(
+      {
+        width: 640,
+        height: 480,
+      },
+      1
+    )
+    resizer.setInput(input)
+    resizer.setOuput(output)
     return async () => {
       revoke()
-      const input = await inputResolver
       input.dispose()
       resizer.dispose()
     }
@@ -71,17 +66,11 @@ export function ResizeToFill() {
         setStat(evt.data)
       }
     })
-    const inputResolver = streamMixer
-      .createCameraInput({ width: 640, height: 480 }, 1)
-      .then((input) => {
-        resizer.setInput(input)
-        resizer.setOuput(output)
-        return input
-      })
-
+    const input = streamMixer.createCameraInput({ width: 640, height: 480 }, 1)
+    resizer.setInput(input)
+    resizer.setOuput(output)
     return async () => {
       revoke()
-      const input = await inputResolver
       input.dispose()
       resizer.dispose()
     }

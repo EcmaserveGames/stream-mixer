@@ -3,6 +3,7 @@ import {
   Output,
   ResizeMixer,
   ScaleMode,
+  Connector,
 } from '@ecmaservegames/stream-mixer-core'
 import { createContext } from 'preact'
 
@@ -16,13 +17,15 @@ export interface StreamMixerContext {
   createCameraInput(
     videoConstraints: MediaTrackConstraints,
     fps?: number
-  ): Promise<CameraInput | undefined>
+  ): CameraInput | undefined
+  createConnector(): Connector | undefined
   createResizeMixer(scaleMode?: ScaleMode): ResizeMixer | undefined
 }
 
 export const StreamMixerContext = createContext<StreamMixerContext>({
   devicesLoading: true,
-  createCameraInput: () => Promise.resolve(undefined),
+  createCameraInput: () => undefined,
   createOutput: () => undefined,
+  createConnector: () => undefined,
   createResizeMixer: () => undefined,
 })

@@ -44,7 +44,6 @@ export class Output implements IOutput {
   push(media: CanvasImageSource) {
     if (!media.width || !media.height) {
       console.log('Output > Input has no data')
-      console.trace()
       return
     }
     var ctx = this.canvas?.getContext('2d')

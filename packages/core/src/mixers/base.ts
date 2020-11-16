@@ -23,7 +23,8 @@ export class BaseMixer implements Mixer {
     this.bucketId = bucketId
     this.onInputFrame = (evt: StreamEvent<any>) => {
       if (evt.source === this) return
-      this.events.dispatchEvent('frame', this, evt.data)
+      if (!this.input) return
+      this.push(this.input.pull())
     }
     this.onOutputResize = (evt: StreamEvent<any>) => {
       if (evt.source === this) return

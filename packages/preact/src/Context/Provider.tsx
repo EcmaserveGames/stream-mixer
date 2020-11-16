@@ -1,5 +1,6 @@
 import { h, Component } from 'preact'
 import { StreamMixerContext } from './Context'
+
 import {
   AssetBucket,
   CameraAsset,
@@ -8,14 +9,17 @@ import {
   Output,
   ScaleMode,
   ResizeMixer,
+  Connector,
 } from '@ecmaservegames/stream-mixer-core'
+
+interface Props {}
 
 interface State {
   loadingDevices: boolean
   devices?: MediaDeviceInfo[]
 }
 
-export class StreamMixerProvider extends Component<{}, State> {
+export class StreamMixerProvider extends Component<Props, State> {
   public state: State = {
     loadingDevices: true,
   }
@@ -23,7 +27,7 @@ export class StreamMixerProvider extends Component<{}, State> {
   private bucketId = 'stream-mixer-preact-asset-bucket'
   private bucket: AssetBucket
 
-  constructor(props: {}) {
+  constructor(props: Props) {
     super(props)
     this.bucket = new AssetBucket(document.body, this.bucketId)
     this.requestDevices()
@@ -37,6 +41,7 @@ export class StreamMixerProvider extends Component<{}, State> {
           createResizeMixer: this.createResizeMixer,
           createOutput: this.createOutput,
           createCameraInput: this.createCameraInput,
+          createConnector: this.createConnector,
         }}
       >
         {this.props.children}
@@ -51,13 +56,13 @@ export class StreamMixerProvider extends Component<{}, State> {
     )
   }
 
-  private createCameraInput = async (
+  private createCameraInput = (
     cameraConstraints: MediaTrackConstraints,
     fps: number = 30
   ) => {
     const cameraAsset = new CameraAsset(this.bucketId)
     const cameraInput = new CameraInput('this-should-change', cameraAsset, fps)
-    await cameraAsset.load(cameraConstraints)
+    cameraAsset.load(cameraConstraints)
     return cameraInput
   }
 
@@ -72,5 +77,9 @@ export class StreamMixerProvider extends Component<{}, State> {
 
   private createResizeMixer = (scaleMode: ScaleMode = ScaleMode.Fill) => {
     return new ResizeMixer(this.bucketId, getId(), scaleMode)
+  }
+
+  private createConnector = (scaleMode: ScaleMode = ScaleMode.Fill) => {
+    return new Connector(this.bucketId, getId())
   }
 }

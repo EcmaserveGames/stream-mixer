@@ -33,6 +33,8 @@ export class VideoAsset implements IAsset {
   private onPlaying = () => {
     this.width = this.node.videoWidth
     this.height = this.node.videoHeight
+    this.node.width = this.node.videoWidth
+    this.node.height = this.node.videoHeight
     this.playing = true
   }
 
