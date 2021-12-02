@@ -2,10 +2,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 
 module.exports = {
+  mode: "development",
   devtool: 'source-map',
   devServer: {
-    contentBase: './temp',
-    hot: true,
+    hot: "only",
   },
   entry: './demo/index.tsx',
   output: {
@@ -39,5 +39,5 @@ module.exports = {
       },
     ],
   },
-  plugins: [new HtmlWebpackPlugin({ template: './demo/index.html' })],
+  plugins: [new HtmlWebpackPlugin({ template: 'demo/index.ejs' })],
 }
